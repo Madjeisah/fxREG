@@ -5,7 +5,6 @@ import argparse
 import numpy as np
 import torch.nn as nn
 from tqdm import trange
-#from tensorboardX import SummaryWriter
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.manifold import TSNE
 import os.path as osp
@@ -23,11 +22,9 @@ import matplotlib.pyplot as plt
 
 from tductive_model import *
 
-
 print('')
 print('Initiating...')
 #time.sleep(60)
-
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -41,8 +38,6 @@ def set_seed(seed):
 	torch.backends.cudnn.deterministic = True
 	torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
 	torch.backends.cudnn.benchmark = False
-
-
 
 class Options:
 
@@ -59,8 +54,7 @@ class Options:
 		self.parser.add_argument("--dataset", dest="dataset", action="store", required=True, type=str,
 			choices=["cora", "citeseer", "pubmed"])
 		self.parser.add_argument("--model", dest="model", action="store", default="gcn", type=str,
-			choices=["gcn", "graphsage"])
-		
+			choices=["gcn", "graphsage"])	
 
 		self.parse()
 
@@ -70,18 +64,16 @@ class Options:
 	def __str__(self):
 		return ("All Options:\n" + "".join(["-"] * 45) + "\n" + "\n".join(["{:<18} -------> {}".format(k, v) for k, v in vars(self.opts).items()]) + "\n" + "".join(["-"] * 45) + "\n")
 
-
 # Load the Cora dataset Citeseer, Pubmed
 def load_dataset(name):
 	if name == "cora":
-		dataset = Planetoid(root="data/Planetoid/", name="Cora", transform=T.NormalizeFeatures())
+		dataset = Planetoid(root="../data/Planetoid/", name="Cora", transform=T.NormalizeFeatures())
 	elif name == "citeseer":
-		dataset = Planetoid(root="data/Planetoid/", name="Citeseer", transform=T.NormalizeFeatures())
+		dataset = Planetoid(root="../data/Planetoid/", name="Citeseer", transform=T.NormalizeFeatures())
 	elif name == "pubmed":
 		dataset = Planetoid(root="data/Planetoid/", name="Pubmed", transform=T.NormalizeFeatures())
 
 	return dataset
-
 
 # Define the warm-up function
 def warmup_scheduler(optimizer, warmup_steps, init_lr):
@@ -91,10 +83,6 @@ def warmup_scheduler(optimizer, warmup_steps, init_lr):
         return 1.0
     scheduler = LambdaLR(optimizer, lr_lambda)
     return scheduler
-
-
-
-
 
 def main(args):
 	dataset = load_dataset(args.dataset)
@@ -116,7 +104,6 @@ def main(args):
 	# Normalize the node features
 	#data.x = (data.x - data.x.mean(dim=0)) / data.x.std(dim=0) 
 	"""
-
 
 	# Split dataset into train, validation, and test sets
 	train_mask, test_mask = train_test_split(range(data.num_nodes), test_size=0.2, random_state=42)
@@ -145,7 +132,6 @@ def main(args):
 
 	# Create the warm-up scheduler
 	scheduler = warmup_scheduler(optimizer, args.warmup_steps, args.init_lr)
-
 
 	def accuracy(output, labels):
 
@@ -177,7 +163,6 @@ def main(args):
 
 		# Update learning rate using the scheduler
 		scheduler.step()
-
 
 		# Evaluate on training and validation set
 		best_val_acc = 0

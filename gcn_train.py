@@ -47,8 +47,6 @@ class GCNWithRegularization(nn.Module):
 
         return F.log_softmax(x, dim=1), reg_loss
 
-
-
 # Define the warm-up function
 def warmup_scheduler(optimizer, warmup_steps, init_lr):
     def lr_lambda(epoch):
@@ -77,22 +75,16 @@ degrees_onehot.to(device).scatter_(1, degrees.unsqueeze(1).long(), 1)
 
 # Expand the node features by concatenating the degrees
 data.x = torch.cat([data.x.to(device), degrees_onehot.to(device)], dim=1)
-
-# Normalize the node features
-#data.x = (data.x - data.x.mean(dim=0)) / data.x.std(dim=0) 
 '''
 
 # Split dataset into train, validation, and test sets
 train_mask, test_mask = train_test_split(range(data.num_nodes), test_size=0.2, random_state=42)
 train_mask, val_mask = train_test_split(train_mask, test_size=0.2, random_state=42)
 
-
 # Print the sizes of each set
 print("Training set size:", len(train_mask))
 print("Validation set size:", len(val_mask))
 print("Test set size:", len(test_mask))
-
-
 
 # Create the Graph Laplacian encoder model
 #remove + degree anytime to remove degree at the top
@@ -185,6 +177,7 @@ print(f'Test Accuracy: {test_acc:.4f}')
 print(' ')
 
 
+"""
 # Plotting the training and validation curves
 plt.figure(figsize=(10, 5))
 epochs = range(num_epochs)
@@ -206,7 +199,6 @@ plt.legend()
 plt.show()
 
 
-"""
 # Obtain the node embeddings
 model.eval()
 with torch.no_grad():
@@ -224,28 +216,4 @@ plt.scatter(node_embeddings_tsne[:, 0], node_embeddings_tsne[:, 1], c=data.y.cpu
 # plt.title('Visualization of Node Embeddings' )
 # plt.colorbar()
 plt.show()
-
-
-# # Calculate information-to-noise ratio for the validation set
-# def calculate_information_noise_ratio(embeddings, labels):
-#     distances = pairwise_distances(embeddings, metric='correlation')
-#     label_distances = distances[labels == 1]
-#     noise_distances = distances[labels == 0]
-#     avg_label_distance = label_distances.mean()
-#     avg_noise_distance = noise_distances.mean()
-#     information_noise_ratio = avg_noise_distance / avg_label_distance
-#     #information_noise_ratio = (1 - information_noise_ratio_)
-#     return information_noise_ratio
-
-# # Calculate information-to-noise ratio for the validation set
-# information_noise_ratio = calculate_information_noise_ratio(node_embeddings_tsne, data.y.cpu())
-
-# # Print the information-to-noise ratio
-# print(f"Information-to-Noise Ratio: {information_noise_ratio:.4f}")
-
-
-# from information_noise_ratio import _calculate_information_noise_ratio
-# # Usage example
-# info_noise_ratio = _calculate_information_noise_ratio(node_embeddings_tsne, data.y.cpu())
-# print(f"Information-to-Noise Ratio: {info_noise_ratio:.4f}")
 """

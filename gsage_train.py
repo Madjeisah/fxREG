@@ -33,9 +33,6 @@ degrees_onehot.to(device).scatter_(1, degrees.unsqueeze(1).long(), 1)
 
 # Expand the node features by concatenating the degrees
 data.x = torch.cat([data.x.to(device), degrees_onehot.to(device)], dim=1)
-
-# Normalize the node features
-#data.x = (data.x - data.x.mean(dim=0)) / data.x.std(dim=0) 
 """
 
 # Split dataset into train, validation, and test sets
@@ -166,7 +163,6 @@ for epoch in range(num_epochs):
     		test_acc = accuracy(test_output[test_idx], data.y[test_idx])
 
     	# Print current learning rate
-    	#print(f"Epoch [{epoch+1}/{num_epochs}], Learning Rate: {scheduler.get_lr()[0]}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
     	print(f"Epoch [{epoch+1}/{num_epochs}], Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
 
 

@@ -51,7 +51,7 @@ class Options:
 		self.parser.add_argument("--layers", dest="layers", action="store", default=2, type=int)
 		self.parser.add_argument("--alpha", dest="alpha", action="store", default=0.01, type=int)
 		self.parser.add_argument("--beta", dest="beta", action="store", default=0.001, type=int)
-		self.parser.add_argument("--dataset", dest="dataset", action="store", required=True, type=str,
+		self.parser.add_argument("--dataset", dest="dataset", action="store", default="cora", type=str,
 			choices=["cora", "citeseer", "pubmed"])
 		self.parser.add_argument("--model", dest="model", action="store", default="gcn", type=str,
 			choices=["gcn", "graphsage"])	
@@ -99,10 +99,7 @@ def main(args):
 	degrees_onehot.to(device).scatter_(1, degrees.unsqueeze(1).long(), 1)
 
 	# Expand the node features by concatenating the degrees
-	data.x = torch.cat([data.x.to(device), degrees_onehot.to(device)], dim=1)
-
-	# Normalize the node features
-	#data.x = (data.x - data.x.mean(dim=0)) / data.x.std(dim=0) 
+	data.x = torch.cat([data.x.to(device), degrees_onehot.to(device)], dim=1) 
 	"""
 
 	# Split dataset into train, validation, and test sets
@@ -161,7 +158,7 @@ def main(args):
 		loss.backward()
 		optimizer.step()
 
-		# Update learning rate using the scheduler
+		# Update the learning rate using the scheduler
 		scheduler.step()
 
 		# Evaluate on training and validation set
@@ -181,7 +178,7 @@ def main(args):
 				test_output, _ = model(data.x, data.edge_index)
 				test_acc = accuracy(test_output[test_mask], data.y[test_mask])
 
-			print(f'Epoch: [{epoch+1}/{args.epochs}], Learning Rate: {scheduler.get_lr()[0]}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}')
+			print(f'Epoch: [{epoch+1}/{args.epochs}], Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}')
 
 		# Store the loss and accuracy values
 		train_losses.append(train_loss.item())
@@ -198,7 +195,7 @@ if __name__ == "__main__":
 	set_seed(0)
 	args = Options()
 	print(args)
-
+	
 	main(args.opts)
 	
 	
